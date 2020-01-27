@@ -94,11 +94,11 @@ class MutagenBilinearLayerParams(BilinearLayerParams):
 
 
 class MutagenLinearLayerParams(LinearLayerParams):
-    def __init__(self, in_dim, out_dim, dropout=0.3):
+    def __init__(self, in_dim, out_dim, dropout=0.5):
         super().__init__(in_dim, out_dim, dropout)
         self.ROW_DIM = in_dim
         self.COL_DIM = out_dim
-        self.ACTIVATION_FUNC = tanh
+        self.ACTIVATION_FUNC = relu
         self.DROPOUT = dropout
 
 
@@ -108,9 +108,9 @@ class MutagenLayeredBilinearModuleParams(LayeredBilinearModuleParams):
         self.EMBED_DIMS = [10]
         self.NORM = NORM_REDUCED
         self.DROPOUT = 0
-        self.LR = 1e-4
+        self.LR = 1e-3
         self.OPTIMIZER = Adam
-        self.WEIGHT_DECAY = 1
+        self.WEIGHT_DECAY = 0.8
 
         if layer_dim is None:
             self.NUM_LAYERS = 2
@@ -130,8 +130,8 @@ class MutagenBilinearActivatorParams(BilinearActivatorParams):
         self.DEV_SPLIT = 0.125
         self.TEST_SPLIT = 0.75
         self.LOSS = functional.binary_cross_entropy_with_logits  # f.factor_loss  #
-        self.BATCH_SIZE = 16
-        self.EPOCHS = 400
+        self.BATCH_SIZE = 8
+        self.EPOCHS = 200
         self.DATASET = "Mutagen"
 
 

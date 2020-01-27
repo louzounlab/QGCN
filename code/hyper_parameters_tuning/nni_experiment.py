@@ -6,17 +6,17 @@ f.write(cwd)
 f.close()
 
 sys.path.insert(1, os.path.join(cwd, ".."))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures", "features_algorithms"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures", "graph_infra"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures", "features_infra"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures", "features_meta"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graph-measures", "features_algorithms", "vertices"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graphs-package", "features_processor"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graphs-package", "multi_graph"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graphs-package", "temporal_graphs"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graphs-package", "features_processor", "motif_variations"))
-sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "dev_graphs-package"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures", "features_algorithms"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures", "graph_infra"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures", "features_infra"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures", "features_meta"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graph-measures", "features_algorithms", "vertices"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graphs-package", "features_processor"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graphs-package", "multi_graph"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graphs-package", "temporal_graphs"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graphs-package", "features_processor", "motif_variations"))
+sys.path.insert(1, os.path.join(cwd, "..", "..", "..", "graphs-package"))
 
 from bilinear_activator import BilinearActivator
 from bilinear_model import LayeredBilinearModule
@@ -50,14 +50,16 @@ def run_trial(params, dataset_param_class, module_param_class, activator_param_c
 
     # model
     layers = []
-    if params['layers_config']["_name"] == "2_layers":
-        layers.append([None, int(params['layers_config']["h1_dim"])])
-        layers.append([int(params['layers_config']["h1_dim"]), int(params['layers_config']["h2_dim"])])
+    for dim1, dim2 in zip([0] + params['layers_config'], params['layers_config']):
+        layers.append((int(dim1), int(dim2)))
+    # if params['layers_config']["_name"] == "2_layers":
+        # layers.append([None, int(params['layers_config']["h1_dim"])])
+        # layers.append([int(params['layers_config']["h1_dim"]), int(params['layers_config']["h2_dim"])])
 
-    elif params['layers_config']["_name"] == "3_layers":
-        layers.append([None, int(params['layers_config']["h1_dim"])])
-        layers.append([int(params['layers_config']["h1_dim"]), int(params['layers_config']["h2_dim"])])
-        layers.append([int(params['layers_config']["h2_dim"]), int(params['layers_config']["h3_dim"])])
+    # elif params['layers_config']["_name"] == "3_layers":
+        # layers.append([None, int(params['layers_config']["h1_dim"])])
+        # layers.append([int(params['layers_config']["h1_dim"]), int(params['layers_config']["h2_dim"])])
+        # layers.append([int(params['layers_config']["h2_dim"]), int(params['layers_config']["h3_dim"])])
 
     model_params = module_param_class(ftr_len=dataset.len_features, layer_dim=layers,
                                       embed_vocab_dim=ext_data.len_embed())
@@ -94,7 +96,7 @@ def get_params_by_dataset(data):
                  ExternalData(AidsAllExternalDataParams()), False],
         "PROTEIN": [ProteinDatasetAllParams, ProteinLayeredBilinearModuleParams, ProteinBilinearActivatorParams,
                     ExternalData(ProteinAllExternalDataParams()), True],
-        "Mutagen": [MutagenDatasetAllParams, MutagenLayeredBilinearModuleParams, MutagenBilinearActivatorParams,
+        "MUTAGEN": [MutagenDatasetAllParams, MutagenLayeredBilinearModuleParams, MutagenBilinearActivatorParams,
                     ExternalData(MutagenAllExternalDataParams()), False],
         "GREC": [GrecDatasetAllParams, GrecLayeredBilinearModuleParams, GrecBilinearActivatorParams,
                     ExternalData(GrecAllExternalDataParams()), True]

@@ -115,6 +115,7 @@ class AidsLayeredBilinearModuleParams(LayeredBilinearModuleParams):
             self.LINEAR_PARAMS_LIST = [
                 AidsLinearLayerParams(in_dim=ftr_len, out_dim=100, dropout=self.DROPOUT),
                 AidsLinearLayerParams(in_dim=100, out_dim=50, dropout=self.DROPOUT),
+                AidsLinearLayerParams(in_dim=100, out_dim=50, dropout=self.DROPOUT)
             ]
         self.BILINEAR_PARAMS = AidsBilinearLayerParams(self.LINEAR_PARAMS_LIST[self.NUM_LAYERS - 1].COL_DIM,
                                                        self.LINEAR_PARAMS_LIST[0].ROW_DIM)
@@ -127,7 +128,7 @@ class AidsBilinearActivatorParams(BilinearActivatorParams):
         self.TEST_SPLIT = 0.538
         self.LOSS = functional.binary_cross_entropy_with_logits  # f.factor_loss  #
         self.BATCH_SIZE = 128
-        self.EPOCHS = 25
+        self.EPOCHS = 250
         self.DATASET = "Aids"
 
 

@@ -234,8 +234,8 @@ class BilinearMultiClassActivator:
             train.dataset,
             batch_size=batch_size,
             collate_fn=train.dataset.collate_fn,
-            sampler=ImbalancedDatasetSampler(train.dataset, indices=train.indices.tolist(),
-                                             num_samples=len(train.indices.tolist()))
+            sampler=ImbalancedDatasetSampler(train.dataset, indices=train.indices,
+                                             num_samples=len(train.indices))
             # shuffle=True
         )
         # set train loader

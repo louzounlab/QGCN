@@ -83,7 +83,7 @@ class ProteinBilinearLayerParams(BilinearLayerParams):
 
 
 class ProteinLinearLayerParams(LinearLayerParams):
-    def __init__(self, in_dim, out_dim, dropout=0.3):
+    def __init__(self, in_dim, out_dim, dropout=0.5):
         super().__init__(in_dim, out_dim, dropout)
         self.ROW_DIM = in_dim
         self.COL_DIM = out_dim
@@ -94,6 +94,7 @@ class ProteinLinearLayerParams(LinearLayerParams):
 class ProteinLayeredBilinearModuleParams(LayeredBilinearModuleParams):
     def __init__(self, ftr_len=6, layer_dim=None, embed_vocab_dim=None):
         super().__init__(ftr_len, layer_dim, embed_vocab_dim)
+        self.IS_BINARY = False
         self.EMBED_DIMS = [10]
         self.NORM = NORM_REDUCED
         self.DROPOUT = 0.5

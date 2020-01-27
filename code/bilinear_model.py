@@ -78,6 +78,7 @@ class LayeredBilinearModule(Module):
         super(LayeredBilinearModule, self).__init__()
 
         # add embedding layers
+        self._is_binary = params.IS_BINARY
         self._is_embed = False if params.EMBED_VOCAB_DIMS is None else True
         if self._is_embed:
             # embeddings are added to ftr vector -> update dimensions of relevant weights
@@ -130,6 +131,7 @@ class LayeredBilinearModule(Module):
         for i in range(self._num_layers):
             x1 = self._linear_layers[i](A, x1)
         x2 = self._bilinear_layer(A, x0, x1)
+        # x2 = torch.sigmoid(x2) if self._is_binary else torch.softmax(x2, dim=1)
         return x2
 
 

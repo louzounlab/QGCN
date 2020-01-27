@@ -1,5 +1,6 @@
+import csv
+import os
 from sys import stdout
-
 import nni
 import torch
 from sklearn.metrics import roc_auc_score
@@ -11,6 +12,7 @@ from bokeh.plotting import figure, show
 from torch.utils.data import DataLoader, random_split, SubsetRandomSampler
 from collections import Counter
 import numpy as np
+
 TRAIN_JOB = "TRAIN"
 DEV_JOB = "DEV"
 TEST_JOB = "TEST"
@@ -153,7 +155,7 @@ class BilinearActivator:
         print("")
 
     # plot loss / accuracy graph
-    def plot_line(self, job=LOSS_PLOT):
+    def plot_line(self, job=LOSS_PLOT, show_plot=True):
         p = figure(plot_width=600, plot_height=250, title=self._dataset + " - Dataset - " + job,
                    x_axis_label="epochs", y_axis_label=job)
         color1, color2, color3 = ("yellow", "orange", "red") if job == LOSS_PLOT else ("black", "green", "blue")
@@ -174,12 +176,43 @@ class BilinearActivator:
         p.line(x_axis, y_axis_train, line_color=color1, legend="train")
         p.line(x_axis, y_axis_dev, line_color=color2, legend="dev")
         p.line(x_axis, y_axis_test, line_color=color3, legend="test")
-        show(p)
+        if show_plot:
+            show(p)
+        return p
 
     def _plot_acc_dev(self):
         self.plot_line(LOSS_PLOT)
         self.plot_line(AUC_PLOT)
         self.plot_line(ACCURACY_PLOT)
+
+    def output_experiment_detail(self, res_path):
+        exp = nni.get_experiment_id()
+        trail = nni.get_trial_id()
+        trail_path = os.path.join(res_path, exp, trail)
+        if not os.path.exists(os.path.join(res_path, exp)):
+            os.mkdir(os.path.join(res_path, exp))
+        if not os.path.exists(trail_path):
+            os.mkdir(trail_path)
+
+        # TODO whatever you want
+        p_loss = self.plot_line(LOSS_PLOT, show_plot=False)
+        p_acc = self.plot_line(ACCURACY_PLOT, show_plot=False)
+        p_auc = self.plot_line(AUC_PLOT, show_plot=False)
+
+        measures_table = [
+            ["train_loss_vec"] + [str(x) for x in self.loss_train_vec],
+            ["train_acc_vec"] + [str(x) for x in self.accuracy_train_vec],
+            ["train_auc_vec"] + [str(x) for x in self.auc_train_vec],
+            ["dev_loss_vec"] + [str(x) for x in self.loss_dev_vec],
+            ["dev_acc_vec"] + [str(x) for x in self.accuracy_dev_vec],
+            ["dev_auc_vec"] + [str(x) for x in self.auc_dev_vec],
+            ["test_loss_vec"] + [str(x) for x in self.loss_test_vec],
+            ["test_acc_vec"] + [str(x) for x in self.accuracy_test_vec],
+            ["test_auc_vec"] + [str(x) for x in self.auc_test_vec]
+        ]
+        with open(os.path.join(res_path, exp, trail, "measures_by_epochs.csv", "wt"), newline="") as f:
+            writer = csv.writer(f)
+            writer.writerows(measures_table)
 
     @property
     def model(self):
@@ -236,8 +269,8 @@ class BilinearActivator:
             train.dataset,
             batch_size=batch_size,
             collate_fn=train.dataset.collate_fn,
-            sampler=ImbalancedDatasetSampler(train.dataset, indices=train.indices.tolist(),
-                                             num_samples=len(train.indices.tolist()))
+            sampler=ImbalancedDatasetSampler(train.dataset, indices=train.indices,
+                                             num_samples=len(train.indices))
             # shuffle=True
         )
         # set train loader
@@ -245,7 +278,7 @@ class BilinearActivator:
             train.dataset,
             batch_size=batch_size,
             collate_fn=train.dataset.collate_fn,
-            sampler=SubsetRandomSampler(train.indices.tolist())
+            sampler=SubsetRandomSampler(train.indices)
             # shuffle=True
         )
 
@@ -292,13 +325,13 @@ class BilinearActivator:
                 # print progress
                 self._model.train()
 
-                output = self._model(A, x0, embed)          # calc output of current model on the current batch
-                loss = self._loss_func(output.squeeze(dim=1).squeeze(dim=1), l.float())             # calculate loss
-                loss.backward()                                 # back propagation
+                output = self._model(A, x0, embed)  # calc output of current model on the current batch
+                loss = self._loss_func(output.squeeze(dim=1).squeeze(dim=1), l.float())  # calculate loss
+                loss.backward()  # back propagation
 
                 # if (batch_index + 1) % self._batch_size == 0 or (batch_index + 1) == len_data:  # batching
-                self._model.optimizer.step()                # update weights
-                self._model.zero_grad()                     # zero gradients
+                self._model.optimizer.step()  # update weights
+                self._model.zero_grad()  # zero gradients
 
                 if not self._nni:
                     self._print_progress(batch_index, len_data, job=TRAIN_JOB)
@@ -309,17 +342,17 @@ class BilinearActivator:
             if not self._nni:
                 self._print_info(jobs=[TRAIN_JOB, DEV_JOB, TEST_JOB])
 
-    # /----------------------  FOR NNI  -------------------------
+            # /----------------------  FOR NNI  -------------------------
             if epoch_num % 10 == 0 and self._nni:
-                test_auc = self._print_test_accuracy
-                nni.report_intermediate_result(test_auc)
+                dev_acc = self._print_dev_accuracy
+                nni.report_intermediate_result(dev_acc)
             if early_stop and epoch_num > 10 and self._print_test_loss > np.mean(self._loss_vec_train[-10:]):
                 break
 
         if self._nni:
-            test_auc = self._print_test_accuracy
-            nni.report_final_result(test_auc)
-    # -----------------------  FOR NNI  -------------------------/
+            dev_auc = self._print_dev_accuracy
+            nni.report_final_result(dev_auc)
+        # -----------------------  FOR NNI  -------------------------/
 
         if show_plot:
             self._plot_acc_dev()
@@ -357,9 +390,11 @@ class BilinearActivator:
 
 if __name__ == '__main__':
     from params.aids_params import AidsDatasetTrainParams, AidsDatasetDevParams, AidsDatasetTestParams
+
     aids_train_ds = BilinearDataset(AidsDatasetTrainParams())
     aids_dev_ds = BilinearDataset(AidsDatasetDevParams())
     aids_test_ds = BilinearDataset(AidsDatasetTestParams())
-    activator = BilinearActivator(LayeredBilinearModule(LayeredBilinearModuleParams(ftr_len=aids_train_ds.len_features)),
-                                  BilinearActivatorParams(), aids_train_ds, dev_data=aids_dev_ds, test_data=aids_test_ds)
+    activator = BilinearActivator(
+        LayeredBilinearModule(LayeredBilinearModuleParams(ftr_len=aids_train_ds.len_features)),
+        BilinearActivatorParams(), aids_train_ds, dev_data=aids_dev_ds, test_data=aids_test_ds)
     activator.train()

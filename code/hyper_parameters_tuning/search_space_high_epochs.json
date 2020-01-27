@@ -1,47 +1,10 @@
-
 {
     "input_vec":{"_type":"choice","_value":[["DEG", "CENTRALITY", "BFS"], ["DEG"]]},
-    "batch_size":{"_type":"choice","_value":[4, 16, 32, 64, 128, 256]},
+    "batch_size":{"_type":"choice","_value":[16, 64, 128]},
     "optimizer":{"_type":"choice","_value":["ADAM", "SGD"]},
-    "learning_rate":{"_type":"uniform","_value":[1e-4, 1]},
-    "dropout":{"_type":"uniform","_value":[0, 0.5]},
-    "regularization":{"_type":"uniform","_value":[0, 1]},
-    "epochs":{"_type":"choice","_value":[200, 400, 800, 1600]},
-    "layers_config": {
-
-        "_type": "choice",
-
-
-        "_value": [
-            {"_name": "2_layers",
-
-                "h1_dim": {
-                    "_type": "uniform",
-                    "_value": [25, 200]
-                },
-
-                "h2_dim": {
-                    "_type": "uniform",
-                    "_value": [25, 200]
-                }
-            },
-
-            {"_name": "3_layers",
-
-                "h1_dim": {
-                    "_type": "uniform",
-                    "_value": [25, 200]
-                },
-                "h2_dim": {
-                    "_type": "uniform",
-                    "_value": [25, 200]
-                },
-                "h3_dim": {
-                    "_type": "uniform",
-                    "_value": [25, 200]
-                }
-            }
-        ]
-    }
-}
-
+    "learning_rate":{"_type":"choice","_value":[1e-4, 1e-2]},
+    "dropout":{"_type":"choice","_value":[0, 0.5]},
+    "regularization":{"_type":"choice","_value":[1e-4, 1e-2, 0]},
+    "epochs":{"_type":"choice","_value":[200, 400, 800]},
+    "layers_config": {"_type": "choice", "_value": [[25, 200], [50, 200], [25, 50 , 200]]}
+  }
