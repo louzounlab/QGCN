@@ -94,6 +94,9 @@ class QGCN(Module):
         super(QGCN, self).__init__()
         self._params = params["model"] if type(params) is dict else json.load(open(params, "rt"))["model"]
 
+        if "f" not in self._params:
+            self._params["f"] = "x1_x0"
+
         # add embedding layers
         self._is_binary = True if self._params["label_type"] == "binary" else False
         self._is_embed = True if self._params["use_embeddings"] == "True" else False

@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 
 
-def get_embeddings_dim():
-    return [10, 10]
+def empty_list():
+    return []
 
 
 def get_GCN_layers():
@@ -17,20 +17,12 @@ def get_default_features():
     return ["DEG", "CENTRALITY", "BFS"]
 
 
-def get_embeddings():
-    return ["chem", "symbol"]
-
-
-def get_continuous():
-    return ["charge", "x", "y"]
-
-
 @dataclass
 class ModelParams:
     label_type: str = "binary"
     num_classes: int = 2
-    use_embeddings: str = "True"
-    embeddings_dim: list[int] = field(default_factory=get_embeddings_dim)
+    use_embeddings: str = "False"
+    embeddings_dim: list[int] = field(default_factory=empty_list)
     activation: str = "relu_"
     dropout: float = 0
     lr: float = 1e-3
@@ -42,17 +34,17 @@ class ModelParams:
 
 @dataclass
 class ActivatorParams:
-    epochs: int = 3
+    epochs: int = 30
     batch_size: int = 128
     loss_func: str = "binary_cross_entropy_with_logits_"
-    train: float = 0.3467
-    dev: float = 0.1153
-    test: float = 0.538
+    train: float = 0.75
+    dev: float = 0.125
+    test: float = 0.125
 
 
 @dataclass
 class GraphsDataParams:
-    file_path: str = "../../test/data/AIDS_all.csv"
+    file_path: str = "../data/data.csv"
     graph_col: str = "g_id"
     src_col: str = "src"
     dst_col: str = "dst"
@@ -66,8 +58,8 @@ class GraphsDataParams:
 
 @dataclass
 class ExternalParams:
-    file_path: str = "../../test/data/AIDS_external_data_all.csv"
+    file_path: str = "../data/external_data.csv"
     graph_col: str = "g_id"
     node_col: str = "node"
-    embeddings: list[str] = field(default_factory=get_embeddings)
-    continuous: list[str] = field(default_factory=get_continuous)
+    embeddings: list[str] = field(default_factory=empty_list)
+    continuous: list[str] = field(default_factory=empty_list)

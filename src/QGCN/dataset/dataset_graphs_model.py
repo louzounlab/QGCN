@@ -45,6 +45,8 @@ BFS = ("bfs_moments", FeatureMeta(BfsMomentsCalculator, {"bfs"}))
 class GraphsDataset(Dataset):
     def __init__(self, params, external_data: ExternalData = None):
         self._params = params if type(params) is dict else json.load(open(params, "rt"))
+        self._params["percentage"] = 1  # default value
+
         self._dataset_name = self._params["dataset_name"]
         self._params = self._params["graphs_data"]
         self._logger = PrintLogger("logger")
