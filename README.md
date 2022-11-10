@@ -68,58 +68,58 @@ g_id,node,charge,chem,symbol,x,y
 
 After creating these file, you should define the parameters of the model. This can be done with a json file, or with data classes.
 The parameters split to 4 groups:
->* **_graphs_data:_**
->  * file_path - the path to the graph csv file (with the edges and labels for each graph)
->  * graph_col - the name of the column with the graph id
->  * src_col - the name of the column with the source node of the edge
->  * dst_col - the name of the column with the target node of the edge
->  * label_col - the name of the column with the label of the graph
->  * directed - indicates if the graph is directed (gets True/False)
->  * features - list of topologic features which will be calculated to the nodes.
->    * The options are - ["DEG", "CENTRALITY", "BFS"]
->    * You can read more about it here >>
->  * adjacency_norm - the norm which will be used (get examples)
->    * The options are - "NORM_REDUCED", "NORM_REDUCED_SYMMETRIC", "IDENTITY", "RAW_FORM"
->  * standardization - the standardization which will be used
->    * The options are - "zscore", "min_max", "scale"
->
->
->* **_external:_**
->  * file_path - the path to the external data csv file (with other node features)
->  * graph_col - the name of the column with the graph id
->  * node_col - the name of the column with the node id
->  * embeddings - a list with the names of the embeddings features of the nodes
->  * continuous - a list with the names of the continuous features of the nodes
->
->
->* **_model:_**
->  * label_type - 'binary' if the predication in binary, 'multi' else
->  * num_classes - number of label types
->  * use_embeddings - if the model should use the embeddings features (gets True/False)
->  * embeddings_dim - a list with the dimensions of the embeddings features
->  * activation - the activation function which will be used. 
->    * Notice that the activation function will be combined with SRSS function. 
->    * The options are - "relu_", "tanh_", "sigmoid_", "srss_"
->  * dropout - the dropout rate of the model
->  * lr - the learning rate of the model
->  * optimizer - the optimizer of the model
->    * The options are - "ADAM_", "SGD_"
->  * L2_regularization - the L2_regularization rate of the model 
->  * GCN_layers - an array with dictionaries for each layer. 
->    * for example: [ <br>
->            { "in_dim": "None", "out_dim": 100 }, <br>
->            { "in_dim": 100, "out_dim": 50 }, <br>
->            { "in_dim": 50, "out_dim": 25 } <br>
->        ]
->
->
->* **_activator:_**
->  * epochs - the epochs number of the model
->  * batch_size - the size of each batch
->  * loss_func - the loss function which will be used
->  * train - percentage of the data which will used for train
->  * dev - percentage of the data which will used for dev
->  * test - percentage of the data which will used for test
+* **_graphs_data:_**
+  * file_path - the path to the graph csv file (with the edges and labels for each graph)
+  * graph_col - the name of the column with the graph id
+  * src_col - the name of the column with the source node of the edge
+  * dst_col - the name of the column with the target node of the edge
+  * label_col - the name of the column with the label of the graph
+  * directed - indicates if the graph is directed (gets True/False)
+  * features - list of topologic features which will be calculated to the nodes.
+    * The options are - ["DEG", "CENTRALITY", "BFS"]
+    * You can read more about it here >>
+  * adjacency_norm - the norm which will be used (get examples)
+    * The options are - "NORM_REDUCED", "NORM_REDUCED_SYMMETRIC", "IDENTITY", "RAW_FORM"
+  * standardization - the standardization which will be used
+    * The options are - "zscore", "min_max", "scale"
+
+
+* **_external:_**
+  * file_path - the path to the external data csv file (with other node features)
+  * graph_col - the name of the column with the graph id
+  * node_col - the name of the column with the node id
+  * embeddings - a list with the names of the embeddings features of the nodes
+  * continuous - a list with the names of the continuous features of the nodes
+
+
+* **_model:_**
+  * label_type - 'binary' if the predication in binary, 'multi' else
+  * num_classes - number of label types
+  * use_embeddings - if the model should use the embeddings features (gets True/False)
+  * embeddings_dim - a list with the dimensions of the embeddings features
+  * activation - the activation function which will be used. 
+    * Notice that the activation function will be combined with SRSS function. 
+    * The options are - "relu_", "tanh_", "sigmoid_", "srss_"
+  * dropout - the dropout rate of the model
+  * lr - the learning rate of the model
+  * optimizer - the optimizer of the model
+    * The options are - "ADAM_", "SGD_"
+  * L2_regularization - the L2_regularization rate of the model 
+  * GCN_layers - an array with dictionaries for each layer. 
+    * for example: [ <br>
+            { "in_dim": "None", "out_dim": 100 }, <br>
+            { "in_dim": 100, "out_dim": 50 }, <br>
+            { "in_dim": 50, "out_dim": 25 } <br>
+        ]
+
+
+* **_activator:_**
+  * epochs - the epochs number of the model
+  * batch_size - the size of each batch
+  * loss_func - the loss function which will be used
+  * train - percentage of the data which will used for train
+  * dev - percentage of the data which will used for dev
+  * test - percentage of the data which will used for test
 
 <br/>
 
@@ -182,6 +182,7 @@ from QGCN.activator import QGCNModel, QGCNDataSet
 qgcn_model = QGCNModel(dataset_name="Aids", params_file="params.json")
 qgcn_model.train()
 ```
+---
 ```python
 from torch.utils.data import DataLoader
 from QGCN.params import GraphsDataParams, ExternalParams, ModelParams, ActivatorParams 
